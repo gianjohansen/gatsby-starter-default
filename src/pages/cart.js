@@ -1,67 +1,80 @@
-import React, { Component } from 'react';
-import PropTypes from 'prop-types';
+import React from 'react';
+
 import styled from 'styled-components';
 
 import { Button } from '../styledComponents/theme';
 import { Heading2 } from '../styledComponents/typography';
+import Layout from "../layouts";
+import { navigate } from "gatsby";
 
-const ActionContainer = styled.div`
-  display: flex;
-  justify-content: flex-end;
+const PhoneLayout = styled.div`
+  width: 100%;
+  max-width: 1200px;
+  margin: 0 auto;
+  position: relative;
+  padding-top: 150px;
+  text-align: center;
+  padding-bottom: 200px;
 `;
 
-class Cart extends Component {
-  static contextTypes = {
-    firebase: PropTypes.object,
-    cart: PropTypes.object
-  };
+const PhoneImage = styled.img`
+margin: 0 auto 40px;
+    display: block;
+`;
+const ResponsiveButton = styled.button`
+display: block;
+margin-top: 20px;
+    background-color: #fdcc08;
+    color: #000;
+    border: none;
+    min-width: 260px;
+    padding: 15px 20px;
+    -webkit-text-decoration: none;
+    text-decoration: none;
+    text-align: center;
+    font-size: 14px;
+    line-height: 1;
+    margin: 20px auto 0;
+`;
+const PhoneName = styled.div`
+    font-size: 20px;
+`;
+const CartWrapper = styled.div`
 
-  createShoppingCart = (cart) => {
-    return <div>
-      { cart.map((item) => {
-          return <p key={item.slug}>{item.name} ({item.quantity})</p>
-      }) }
-    </div>;
-  }
+`;
+const ItemsWrapper = styled.div`
+    margin-bottom: 60px;
+`;
 
-  handleCheckout = () => {
-    const { firebase } = this.context;
-    const { history } = this.props;
+const getItems = () => {
+    let items = localStorage.getItem('cart') || '{ "items": [] }';
+    items = JSON.parse(items);
+    return items.items;
+}
+const clearItems = () => {
+    localStorage.removeItem('cart');
+    navigate('/');
 
-    let cart = localStorage.getItem('cart') || '{ "items": [] }';
-    cart = JSON.parse(cart);
-
-    firebase.orders
-      .add({
-        items: cart.items
-      })
-      .then(() => {
-        localStorage.setItem("cart", JSON.stringify({ "items": [] }));
-        history.push({ pathname: "/refresh" });
-        history.replace({ pathname: "/cart" });
-      })
-      .catch(error => {
-        // eslint-disable-next-line no-console
-        console.error(error);
-        // TODO: notify the user of the error
-      });
-  }
-
-  render() {
-      const { cart } = this.context;
-    return (
-      <div>
-        <Heading2>Your cart</Heading2>
-        { cart && this.createShoppingCart(cart.getAllItems.items) }
-        <ActionContainer>
-          <Button
-            onClick={this.handleCheckout}>
-            Submit Order
-          </Button>
-        </ActionContainer>
-      </div>
-    );
-  }
 }
 
-export default Cart;
+const DetailsPage = props => {
+ console.log(props);
+  return (
+    <Layout>
+      <PhoneLayout>
+          <Heading2>Your cart</Heading2>
+          <CartWrapper>
+              <ItemsWrapper>
+            { getItems().map((item) => {
+                return <div>{item}</div>;
+            }) }
+              </ItemsWrapper>
+            <ResponsiveButton onClick={ (e) => { clearItems(); } }>Checkout</ResponsiveButton>
+            <ResponsiveButton onClick={ (e) => { navigate('/mobile'); } }>Go back</ResponsiveButton>
+          </CartWrapper>
+      </PhoneLayout>
+    </Layout>
+  );
+};
+
+export default DetailsPage;

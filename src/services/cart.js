@@ -18,7 +18,7 @@ class Cart {
         Object.assign(item, { quantity: 1 });
         items.items.push(item);
     }
-    localStorage.setItem(this.storage, JSON.stringify(items));
+    // localStorage.setItem(this.storage, JSON.stringify(items));
   }
 
   get getAllItems() {
